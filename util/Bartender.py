@@ -1,8 +1,15 @@
 # coding: utf-8
-
+'''
+@author: Keeth S.
+@dependencies: requests, discord
+@desc: Calls API and fills a Drink object to be served to robbot.py
+@retunrs: Drink object with embed method
+@TODO Account for ingredients that do not have corresponding measurements
+'''
 # In[180]:
 
 import requests
+import discord
 
 # In[193]:
 
@@ -35,13 +42,36 @@ class Drink():
             string += '\t' + element + '\n'
         string += 'Instructions: ' + self.instructions
         return string
+    
+    '''
+    # Creates the formated embed when called. 
+    # Iterates through ingredients and adds them to a field
+    '''
+    def embed(self):
+        drink_embed = discord.Embed(title='Buds Bartender', description='A drink for you, dear bud.', color=1146986)
+        drink_embed.set_image(url=self.img)
+        drink_embed.add_field(name="Name", value=self.name)
+        drink_embed.add_field(name="Category", value=self.category)
+        drink_embed.add_field(name="\u200b", value='\u200b')
+        drink_embed.add_field(name="Alcoholic?", value=self.alcoholic)
+        drink_embed.add_field(name="Glass Type", value=self.glass)
+        drink_embed.add_field(name="\u200b", value='\u200b')
+        ingredient_string = ""
+        for string in self.ingredients:
+            ingredient_string += string + '\n'
+        drink_embed.add_field(name="Ingredients", value=ingredient_string, inline=False)
+        drink_embed.add_field(name="Instructions", value=self.instructions, inline=False)
+        drink_embed.set_footer(text="Have ideas for additional functionality? Throw them in #robbot_discussion!")
+        return drink_embed
         
 
 
 # In[194]:
 
 '''
-# Gets drink data from the API, removes empty fields and returns a 
+# Gets drink data from the API
+# Removes empty fields
+# Returns a Drink object 
 '''
 def get_drink():
     res = requests.get('https://www.thecocktaildb.com/api/json/v1/1/random.php')
