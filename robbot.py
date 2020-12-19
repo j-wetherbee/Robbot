@@ -55,4 +55,8 @@ async def check_react_ohwow(message):
             if emoji.name == 'ohwow':
                 await message.add_reaction(emoji)
 
+# TODO Add Cocktail Function
+def get_cocktail(msg):
+    pass
+
 client.run(TOKEN)
