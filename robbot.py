@@ -2,6 +2,7 @@ import os
 import discord
 from requests.api import get
 from util import Bartender
+from util.Pin import Pin
 from dotenv import load_dotenv
 
 SHEBANGS = '.!$'
@@ -65,7 +66,7 @@ async def check_react_ohwow(message):
 @author: Keeth S.
 @dependencies: util/Bartender.py
 @desc: Returns a random drink embedded from the Drink object's  embed method
-@retunrs: async message back to channgel
+@retunrs: async message back to channel
 # TODO Optimize Drink Object.
 '''
 async def get_cocktail(msg):
@@ -76,10 +77,25 @@ async def get_cocktail(msg):
         print(ex)
         await msg.channel.send('Ayo, your code is wack.')
 
-# TODO Find replyed message through author
-# Make emebd 
-# Post to Pin
+'''
+@author: Keeth S.
+@dependencies: util/Pin.py
+@desc: Sends a embed to the Pin channel when a user reply's to a message with .pin
+@retunrs: async message back to channel confirming message was pinned
+# TODO Optimize Drink Object.
+'''
 async def pin_message(msg):
-    pass
+    try:
+        if not msg.reference:
+            await msg.channel.send('Sorry, bud. Just can\'t do it.')
+            return
+        reply = await msg.channel.fetch_message(msg.reference.message_id)
+        pin_embed = Pin(reply)
+        pin_channel = client.get_channel(789771971532947486)
+        await pin_channel.send(embed=pin_embed.embed())
+        await msg.channel.send('You got it, bud.')
+    except Exception as ex:
+        print(ex)
+        await msg.channel.send('Ayo, your code is wack.')
 
 client.run(TOKEN)
