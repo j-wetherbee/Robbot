@@ -34,6 +34,8 @@ async def on_message(message):
         await message.channel.send('hey')
     if cmd == 'drink' or cmd == 'cocktail':
         await get_cocktail(message)
+    if cmd == 'pin':
+        await pin_message(message)
     
     return
 
@@ -73,5 +75,11 @@ async def get_cocktail(msg):
     except Exception as ex:
         print(ex)
         await msg.channel.send('Ayo, your code is wack.')
+
+# TODO Find replyed message through author
+# Make emebd 
+# Post to Pin
+async def pin_message(msg):
+    pass
 
 client.run(TOKEN)
