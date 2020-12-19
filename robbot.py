@@ -74,7 +74,7 @@ async def get_cocktail(msg):
         embed_var.add_field(name="Name", value=drink.name)
         embed_var.add_field(name="Category", value=drink.category)
         embed_var.add_field(name="\u200b", value='\u200b')
-        embed_var.add_field(name="\Alcoholic?", value=drink.alcoholic)
+        embed_var.add_field(name="Alcoholic?", value=drink.alcoholic)
         embed_var.add_field(name="Glass Type", value=drink.glass)
         embed_var.add_field(name="\u200b", value='\u200b')
         ingredient_string = ""
