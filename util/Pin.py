@@ -64,6 +64,7 @@ class Pin:
         formated_date = datetime.date.strftime(message.created_at, "%m/%d/%Y")
         self.posted_date = formated_date
         self.content = message.content
+        self.url = message.jump_url
     
     def embed(self):
         pin_embed = discord.Embed(title=self.author, description=f'Posted on {self.posted_date}', color=colors.get(self.id))
@@ -71,6 +72,6 @@ class Pin:
         pin_embed.image.width = 300
         pin_embed.image.height = 300
         pin_embed.add_field(name="Channel", value=self.channel, inline=False)
-        pin_embed.add_field(name="Message", value=self.content, inline=False)
+        pin_embed.add_field(name="Message", value=f'[{self.content}]({self.url})', inline=False)
         return pin_embed
 
