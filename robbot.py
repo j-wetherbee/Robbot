@@ -1,19 +1,24 @@
 import os
 import discord
+import json
+import random
 from dotenv import load_dotenv
 
 SHEBANGS = '.!$'
+CFG_FILENAME = 'config.json'
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 client = discord.Client()
 
+with open(CFG_FILENAME) as cfg:
+    CFG = json.load(cfg)
+
 
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
-
 
 @client.event
 async def on_message(message):
@@ -25,15 +30,16 @@ async def on_message(message):
     cmd = get_msg_cmd(message)
 
     if cmd == '8ball':
-        pass
+        responses = CFG['8ball_responses']
+        rand_i = random.randint(0, len(responses) - 1)
+        response = responses[rand_i]
+        await message.channel.send(response)
+
     if cmd == 'roll':
         pass
     if cmd == 'bg':
         await message.channel.send('hey')
-    
     return
-
-
 
 def should_respond_msg(msg) -> bool:
     if msg.author == client.user:  # Robbot is the author
