@@ -73,7 +73,7 @@ class Drink():
 # Removes empty fields
 # Returns a Drink object 
 '''
-def get_drink():
+def get_random_drink():
     res = requests.get('https://www.thecocktaildb.com/api/json/v1/1/random.php')
     temp = (res.json())['drinks'][0]    
     
