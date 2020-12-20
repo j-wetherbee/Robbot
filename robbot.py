@@ -2,6 +2,7 @@ import os
 import discord
 import json
 import random
+import re
 from dotenv import load_dotenv
 
 SHEBANGS = '.!$'
@@ -36,7 +37,25 @@ async def on_message(message):
         await message.channel.send(response)
 
     if cmd == 'roll':
-        pass
+        dice_pattern = r'[0-9]*(d)[0-9]+'  # optional number, d, at least one number, e.g. 2d8, d20, etc
+
+        match = re.search(dice_pattern, message.content)
+        if match is not None:
+            parts = match.group(0).split('d')
+            try:
+                num_rolls = int(parts[0])
+            except:
+                num_rolls = 1
+            max_roll = int(parts[1])
+            response = f'Roll {num_rolls}d{max_roll}: '
+            for i in range(num_rolls):
+                response += (str(random.randint(1, max_roll)) + ', ')
+            response = response[:-2]
+            await message.channel.send(response)
+        else:
+            await message.channel.send(str(random.randint(1, 100)))
+
+
     if cmd == 'bg':
         await message.channel.send('hey')
     return
