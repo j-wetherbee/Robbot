@@ -1,21 +1,29 @@
 import os
 import discord
-from requests.api import get
-from util import Bartender
+import json
+import random
+import re
 from dotenv import load_dotenv
 
+from requests.api import get
+from util import Bartender
+
+
 SHEBANGS = '.!$'
+CFG_FILENAME = 'config.json'
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 client = discord.Client()
 
+with open(CFG_FILENAME) as cfg:
+    CFG = json.load(cfg)
+
 
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
-
 
 @client.event
 async def on_message(message):
@@ -27,17 +35,39 @@ async def on_message(message):
     cmd = get_msg_cmd(message)
 
     if cmd == '8ball':
-        pass
+        responses = CFG['8ball_responses']
+        rand_i = random.randint(0, len(responses) - 1)
+        response = responses[rand_i]
+        await message.channel.send(response)
+
     if cmd == 'roll':
-        pass
+        dice_pattern = r'[0-9]*(d)[0-9]+'  # optional number, d, at least one number, e.g. 2d8, d20, etc
+
+        match = re.search(dice_pattern, message.content)
+        if match is not None:
+            parts = match.group(0).split('d')
+            try:
+                num_rolls = int(parts[0])
+            except:
+                num_rolls = 1
+            max_roll = int(parts[1])
+            response = f'Roll {num_rolls}d{max_roll}: '
+            for i in range(num_rolls):
+                response += (str(random.randint(1, max_roll)) + ', ')
+            response = response[:-2]
+            await message.channel.send(response)
+        else:
+            await message.channel.send(str(random.randint(1, 100)))
+
+
     if cmd == 'bg':
         await message.channel.send('hey')
+        
     if cmd == 'drink' or cmd == 'cocktail':
         await get_cocktail(message)
     
     return
-
-
+  
 
 def should_respond_msg(msg) -> bool:
     if msg.author == client.user:  # Robbot is the author
