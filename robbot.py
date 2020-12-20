@@ -5,6 +5,10 @@ import random
 import re
 from dotenv import load_dotenv
 
+from requests.api import get
+from util import Bartender
+
+
 SHEBANGS = '.!$'
 CFG_FILENAME = 'config.json'
 
@@ -58,7 +62,12 @@ async def on_message(message):
 
     if cmd == 'bg':
         await message.channel.send('hey')
+        
+    if cmd == 'drink' or cmd == 'cocktail':
+        await get_cocktail(message)
+    
     return
+  
 
 def should_respond_msg(msg) -> bool:
     if msg.author == client.user:  # Robbot is the author
@@ -79,5 +88,20 @@ async def check_react_ohwow(message):
         for emoji in client.emojis:
             if emoji.name == 'ohwow':
                 await message.add_reaction(emoji)
+
+'''
+@author: Keeth S.
+@dependencies: util/Bartender.py
+@desc: Returns a random drink embedded from the Drink object's  embed method
+@retunrs: async message back to channgel
+# TODO Optimize Drink Object.
+'''
+async def get_cocktail(msg):
+    try:
+        
+        await msg.channel.send(embed=Bartender.get_drink().embed())
+    except Exception as ex:
+        print(ex)
+        await msg.channel.send('Ayo, your code is wack.')
 
 client.run(TOKEN)
