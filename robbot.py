@@ -32,25 +32,38 @@ async def shake_8ball(ctx):
 
 @bot.command(name='roll')
 async def roll(ctx, *args):
-    dice_pattern = r'[0-9]*(d)[0-9]+'  # optional number, d, at least one number, e.g. 2d8, d20, etc
+    dice_pattern = r'([0-9]*d[0-9]+)(\+[0-9]+)*'  # optional number, d, at least one number, e.g. 2d8, d20, etc
 
-    for arg in args:
-        match = re.search(dice_pattern, arg)
-        if match is not None:
-            parts = match.group(0).split('d')
+    matches = re.findall(dice_pattern, ' '.join(args))
+
+    response = ''
+    if len(matches) > 0:
+        for match in matches:
+            roll_part, offset_part = match
+
+            if '+' in offset_part:
+                _, offset = offset_part.split('+')
+                offset = int(offset)
+            else:
+                offset = 0
+            
+            num_rolls, max_roll = roll_part.split('d')
             try:
-                num_rolls = int(parts[0])
+                num_rolls = int(num_rolls)
             except:
                 num_rolls = 1
-            max_roll = int(parts[1])
-            response = f'Roll {num_rolls}d{max_roll}: '
-            for _ in range(num_rolls):
-                response += (str(random.randint(1, max_roll)) + ', ')
-            response = response[:-2]
-            await ctx.send(response)
-            break  
+            max_roll = int(max_roll)
+
+            response += f'Roll {num_rolls}d{max_roll}+{offset}:    '
+
+            rolls = [random.randint(1, max_roll) for _ in range(num_rolls)]
+            roll_sum = sum(rolls) + offset
+            roll_str = ' + '.join([str(roll) for roll in rolls]) + f' + {str(offset)} = {str(roll_sum)}\n'  # all this str() business is silly
+            response += roll_str
     else:
-        await ctx.send(str(random.randint(1, 100)))
+        response = str(random.randint(1,100))
+
+    await ctx.send(response)
 
 @bot.command(name='cocktail')
 async def get_cocktail(ctx):
