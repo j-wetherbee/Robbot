@@ -1,11 +1,17 @@
 import os
 import discord
-from requests.api import get
-from util import Bartender
+import requests
+from util.Request import Request
+from util.Bartender import Drink
+from util.Sanitizer import DrinkJsonSanitizer
+from util.Formatter import DrinkFormatter
+from util.Embedder import DrinkEmbedder
 from util.Pin import Pin
 from dotenv import load_dotenv
 
+
 SHEBANGS = '.!$'
+request = Request(requests)
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -70,12 +76,10 @@ async def check_react_ohwow(message):
 # TODO Optimize Drink Object.
 '''
 async def get_cocktail(msg):
-    try:
-        
-        await msg.channel.send(embed=Bartender.get_drink().embed())
-    except Exception as ex:
-        print(ex)
-        await msg.channel.send('Ayo, your code is wack.')
+
+    drink_json = request.get_drink_json()
+    drink = Drink(drink_json, sanitizer=DrinkJsonSanitizer, formatter=DrinkFormatter, embedder=DrinkEmbedder)
+    await msg.channel.send(embed = drink.embed)
 
 '''
 @author: Keeth S.
