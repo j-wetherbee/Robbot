@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from requests.api import get
 from util import Bartender
 
-SHEBANGS = '.!$'
+
 CFG_FILENAME = 'config.json'
 
 load_dotenv()
