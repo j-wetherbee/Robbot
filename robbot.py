@@ -1,5 +1,6 @@
 import os
 import discord
+<<<<<<< HEAD
 import json
 import random
 import re
@@ -8,9 +9,24 @@ from dotenv import load_dotenv
 from requests.api import get
 from util import Bartender
 
+=======
+import requests
+from util.Request import Request
+from util.Bartender import Drink
+from util.Sanitizer import DrinkJsonSanitizer
+from util.Formatter import DrinkFormatter
+from util.Embedder import DrinkEmbedder
+from util.Pin import Pin
+from dotenv import load_dotenv
+>>>>>>> Pin
+
 
 SHEBANGS = '.!$'
+<<<<<<< HEAD
 CFG_FILENAME = 'config.json'
+=======
+request = Request(requests)
+>>>>>>> Pin
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -65,6 +81,8 @@ async def on_message(message):
         
     if cmd == 'drink' or cmd == 'cocktail':
         await get_cocktail(message)
+    if cmd == 'pin':
+        await pin_message(message)
     
     return
   
@@ -93,13 +111,32 @@ async def check_react_ohwow(message):
 @author: Keeth S.
 @dependencies: util/Bartender.py
 @desc: Returns a random drink embedded from the Drink object's  embed method
-@retunrs: async message back to channgel
+@retunrs: async message back to channel
 # TODO Optimize Drink Object.
 '''
 async def get_cocktail(msg):
+
+    drink_json = request.get_drink_json()
+    drink = Drink(drink_json, sanitizer=DrinkJsonSanitizer, formatter=DrinkFormatter, embedder=DrinkEmbedder)
+    await msg.channel.send(embed = drink.embed)
+
+'''
+@author: Keeth S.
+@dependencies: util/Pin.py
+@desc: Sends a embed to the Pin channel when a user reply's to a message with .pin
+@retunrs: async message back to channel confirming message was pinned
+# TODO Optimize Drink Object.
+'''
+async def pin_message(msg):
     try:
-        
-        await msg.channel.send(embed=Bartender.get_drink().embed())
+        if not msg.reference:
+            await msg.channel.send('Sorry, bud. Just can\'t do it.')
+            return
+        reply = await msg.channel.fetch_message(msg.reference.message_id)
+        pin_embed = Pin(reply)
+        pin_channel = client.get_channel(789771971532947486)
+        await pin_channel.send(embed=pin_embed.embed())
+        await msg.channel.send('You got it, bud.')
     except Exception as ex:
         print(ex)
         await msg.channel.send('Ayo, your code is wack.')
