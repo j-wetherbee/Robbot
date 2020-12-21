@@ -68,7 +68,6 @@ async def drink(ctx):
 async def test(ctx):
     await ctx.send('.test')
 
-
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
@@ -77,39 +76,15 @@ async def on_ready():
 async def on_message(message):
     await check_react_ohwow(message)
 
-    # if not should_respond_msg(message):
-    #     return
-
-    cmd = get_msg_cmd(message)
-        
-    # if cmd == 'drink' or cmd == 'cocktail':
-    #     await get_cocktail(message)
-
     await bot.process_commands(message)
     
     return
-  
-
-def should_respond_msg(msg) -> bool:
-    if msg.author == bot.user:  # Robbot is the author
-        return False
-    if msg.content[0] not in SHEBANGS:
-        return False
-    return True
-
-def get_msg_cmd(msg):
-    content = msg.content[1:]
-    parts = content.split()
-    cmd = parts[0].lower()  # TODO check parts nonempty
-
-    return cmd
 
 async def check_react_ohwow(message):
     if 'oh wow' in message.content.lower():
         for emoji in bot.emojis:
             if emoji.name == 'ohwow':
                 await message.add_reaction(emoji)
-
 
 
 bot.run(TOKEN)
