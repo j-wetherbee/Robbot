@@ -26,8 +26,7 @@ bot = commands.Bot(command_prefix='.')
 @bot.command(name='8ball')
 async def shake_8ball(ctx):
     responses = CFG['8ball_responses']
-    rand_i = random.randint(0, len(responses) - 1)
-    response = responses[rand_i]
+    response = random.choice(responses)
     await ctx.send(response)
 
 @bot.command(name='roll')
