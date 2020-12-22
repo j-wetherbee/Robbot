@@ -1,16 +1,10 @@
 import os
 import discord
-<<<<<<< HEAD
 import json
 import random
 import re
-from dotenv import load_dotenv
-
-from requests.api import get
-from util import Bartender
-
-=======
 import requests
+from dotenv import load_dotenv
 from util.Request import Request
 from util.Bartender import Drink
 from util.Sanitizer import DrinkJsonSanitizer
@@ -18,15 +12,11 @@ from util.Formatter import DrinkFormatter
 from util.Embedder import DrinkEmbedder
 from util.Pin import Pin
 from dotenv import load_dotenv
->>>>>>> Pin
-
 
 SHEBANGS = '.!$'
-<<<<<<< HEAD
 CFG_FILENAME = 'config.json'
-=======
 request = Request(requests)
->>>>>>> Pin
+
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
