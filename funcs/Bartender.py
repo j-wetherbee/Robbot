@@ -1,14 +1,10 @@
-from .Sanitizer import DrinkJsonSanitizer
-from .Formatter import DrinkFormatter
-from .Embedder  import DrinkEmbedder, Embedder
-
 class Drink():
 
-    def __init__(self, json, sanitizer=DrinkJsonSanitizer, formatter=DrinkFormatter, embedder=DrinkEmbedder):
+    def __init__(self, json, sanitizer, formatter, embedder):
         
-        self.sanitizer = DrinkJsonSanitizer(json)
+        self.sanitizer = sanitizer(json)
         json = self.sanitizer.clean_json()
-        self.formatter = DrinkFormatter(json)
+        self.formatter = formatter(json)
         self.img = json.get('strDrinkThumb')
         self.name = json.get('strDrink')
         self.category = json.get('strCategory')
@@ -16,7 +12,7 @@ class Drink():
         self.glass = json.get('strGlass')
         self.ingredients = self.formatter.make_ingredients_string()
         self.instructions = json.get('strInstructions')
-        self.embed = DrinkEmbedder(self).embed
+        self.embed = embedder(self).embed
         
     def __repr__(self):
         new_line='\n'
