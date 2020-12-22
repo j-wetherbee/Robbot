@@ -31,38 +31,59 @@ async def shake_8ball(ctx):
 
 @bot.command(name='roll')
 async def roll(ctx, *args):
-    dice_pattern = r'([0-9]*d[0-9]+)(\+[0-9]+)*'  # optional number, d, at least one number, e.g. 2d8, d20, etc
+    args_as_str = ' '.join(args)
 
-    matches = re.findall(dice_pattern, ' '.join(args))
-
-    response = ''
-    if len(matches) > 0:
-        for match in matches:
-            roll_part, offset_part = match
-
-            if '+' in offset_part:
-                _, offset = offset_part.split('+')
-                offset = int(offset)
-            else:
-                offset = 0
-            
-            num_rolls, max_roll = roll_part.split('d')
-            try:
-                num_rolls = int(num_rolls)
-            except:
-                num_rolls = 1
-            max_roll = int(max_roll)
-
-            response += f'Roll {num_rolls}d{max_roll}+{offset}:    '
-
-            rolls = [random.randint(1, max_roll) for _ in range(num_rolls)]
-            roll_sum = sum(rolls) + offset
-            roll_str = ' + '.join([str(roll) for roll in rolls]) + f' + {str(offset)} = {str(roll_sum)}\n'  # all this str() business is silly
-            response += roll_str
+    dnd_rolls = _find_dnd_rolls(args_as_str)
+    
+    # TODO probably replace this with polymorphism
+    if dnd_rolls:
+        response = _roll_dnd_dice(dnd_rolls)
     else:
         response = str(random.randint(1,100))
 
     await ctx.send(response)
+
+def _find_dnd_rolls(to_search: str):
+    dice_pattern = r'([0-9]*d[0-9]+)(\+[0-9]+)*'
+    matches = re.findall(dice_pattern, to_search)
+    return matches
+
+def _roll_dnd_dice(roll_descriptions):
+    results = [_roll_dnd_die(roll) for roll in roll_descriptions]
+    return ''.join(results)
+
+def _roll_dnd_die(roll_description):
+    roll_part, offset_part = roll_description  # roll_description doesn't shed any light on what it actually is, a tuple of matching regex groups
+
+    offset = _get_dnd_roll_offset(offset_part)
+    num_rolls = _get_dnd_roll_num(roll_part)
+    max_roll = _get_dnd_roll_max(roll_part)
+    
+    result = f'Roll {num_rolls}d{max_roll}+{offset}:    '
+    rolls = [random.randint(1, max_roll) for _ in range(num_rolls)]  # the way this stuff is written prevents it from being further decoupled, e.g. a func that rolls once contained in a larger func that rolls all and sums
+    roll_sum = sum(rolls) + offset
+    result += ' + '.join([str(roll) for roll in rolls]) + f' + {str(offset)} = {str(roll_sum)}\n'  # all this str() business is silly
+
+    return result
+
+def _get_dnd_roll_offset(offset_description):
+    offset_parts = offset_description.split('+')
+    offset = offset_parts[-1]
+    if not offset:
+        offset = 0
+    return int(offset)
+
+def _get_dnd_roll_num(roll_description):
+    roll_parts = roll_description.split('d')
+    num_rolls = roll_parts[0]
+    if not num_rolls:
+        num_rolls = 1
+    return int(num_rolls)
+
+def _get_dnd_roll_max(roll_description):
+    roll_parts = roll_description.split('d')
+    max_roll = roll_parts[-1]
+    return int(max_roll)
 
 @bot.command(name='cocktail')
 async def get_cocktail(ctx):
