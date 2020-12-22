@@ -1,9 +1,9 @@
 import os
-import discord
 import json
 import random
 import re
 import requests
+from discord.ext import commands
 from dotenv import load_dotenv
 from util.Request import Request
 from util.Bartender import Drink
@@ -11,9 +11,8 @@ from util.Sanitizer import DrinkJsonSanitizer
 from util.Formatter import DrinkFormatter
 from util.Embedder import DrinkEmbedder
 from util.Pin import Pin
-from dotenv import load_dotenv
 
-SHEBANGS = '.!$'
+
 CFG_FILENAME = 'config.json'
 request = Request(requests)
 
@@ -21,79 +20,87 @@ request = Request(requests)
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client()
-
 with open(CFG_FILENAME) as cfg:
     CFG = json.load(cfg)
 
 
-@client.event
-async def on_ready():
-    print(f'{client.user} has connected to Discord!')
+bot = commands.Bot(command_prefix='.')
 
-@client.event
+@bot.command(name='8ball')
+async def shake_8ball(ctx):
+    responses = CFG['8ball_responses']
+    rand_i = random.randint(0, len(responses) - 1)
+    response = responses[rand_i]
+    await ctx.send(response)
+
+@bot.command(name='roll')
+async def roll(ctx, *args):
+    dice_pattern = r'([0-9]*d[0-9]+)(\+[0-9]+)*'  # optional number, d, at least one number, e.g. 2d8, d20, etc
+
+    matches = re.findall(dice_pattern, ' '.join(args))
+
+    response = ''
+    if len(matches) > 0:
+        for match in matches:
+            roll_part, offset_part = match
+
+            if '+' in offset_part:
+                _, offset = offset_part.split('+')
+                offset = int(offset)
+            else:
+                offset = 0
+            
+            num_rolls, max_roll = roll_part.split('d')
+            try:
+                num_rolls = int(num_rolls)
+            except:
+                num_rolls = 1
+            max_roll = int(max_roll)
+
+            response += f'Roll {num_rolls}d{max_roll}+{offset}:    '
+
+            rolls = [random.randint(1, max_roll) for _ in range(num_rolls)]
+            roll_sum = sum(rolls) + offset
+            roll_str = ' + '.join([str(roll) for roll in rolls]) + f' + {str(offset)} = {str(roll_sum)}\n'  # all this str() business is silly
+            response += roll_str
+    else:
+        response = str(random.randint(1,100))
+
+    await ctx.send(response)
+
+@bot.command()
+async def drink(ctx):
+    try:
+        drink_json = request.get_drink_json()
+        drink = Drink(drink_json, sanitizer=DrinkJsonSanitizer, formatter=DrinkFormatter, embedder=DrinkEmbedder)
+        await ctx.send(embed = drink.embed)
+    except Exception as ex:
+        print(ex)
+        await ctx.send('Ayo, your code is wack.')
+
+@bot.command()
+async def test(ctx):
+    await ctx.send('.test')
+
+@bot.command()
+async def cocktail(ctx):
+    await drink(ctx)
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+
+@bot.event
 async def on_message(message):
     await check_react_ohwow(message)
 
-    if not should_respond_msg(message):
-        return
-
-    cmd = get_msg_cmd(message)
-
-    if cmd == '8ball':
-        responses = CFG['8ball_responses']
-        rand_i = random.randint(0, len(responses) - 1)
-        response = responses[rand_i]
-        await message.channel.send(response)
-
-    if cmd == 'roll':
-        dice_pattern = r'[0-9]*(d)[0-9]+'  # optional number, d, at least one number, e.g. 2d8, d20, etc
-
-        match = re.search(dice_pattern, message.content)
-        if match is not None:
-            parts = match.group(0).split('d')
-            try:
-                num_rolls = int(parts[0])
-            except:
-                num_rolls = 1
-            max_roll = int(parts[1])
-            response = f'Roll {num_rolls}d{max_roll}: '
-            for i in range(num_rolls):
-                response += (str(random.randint(1, max_roll)) + ', ')
-            response = response[:-2]
-            await message.channel.send(response)
-        else:
-            await message.channel.send(str(random.randint(1, 100)))
-
-
-    if cmd == 'bg':
-        await message.channel.send('hey')
-        
-    if cmd == 'drink' or cmd == 'cocktail':
-        await get_cocktail(message)
-    if cmd == 'pin':
-        await pin_message(message)
+    await bot.process_commands(message)
     
     return
-  
-
-def should_respond_msg(msg) -> bool:
-    if msg.author == client.user:  # Robbot is the author
-        return False
-    if msg.content[0] not in SHEBANGS:
-        return False
-    return True
-
-def get_msg_cmd(msg):
-    content = msg.content[1:]
-    parts = content.split()
-    cmd = parts[0].lower()  # TODO check parts nonempty
-
-    return cmd
 
 async def check_react_ohwow(message):
     if 'oh wow' in message.content.lower():
-        for emoji in client.emojis:
+        for emoji in bot.emojis:
             if emoji.name == 'ohwow':
                 await message.add_reaction(emoji)
 
@@ -106,9 +113,7 @@ async def check_react_ohwow(message):
 '''
 async def get_cocktail(msg):
 
-    drink_json = request.get_drink_json()
-    drink = Drink(drink_json, sanitizer=DrinkJsonSanitizer, formatter=DrinkFormatter, embedder=DrinkEmbedder)
-    await msg.channel.send(embed = drink.embed)
+    pass
 
 '''
 @author: Keeth S.
@@ -117,18 +122,18 @@ async def get_cocktail(msg):
 @retunrs: async message back to channel confirming message was pinned
 # TODO Optimize Drink Object.
 '''
-async def pin_message(msg):
-    try:
-        if not msg.reference:
-            await msg.channel.send('Sorry, bud. Just can\'t do it.')
-            return
-        reply = await msg.channel.fetch_message(msg.reference.message_id)
-        pin_embed = Pin(reply)
-        pin_channel = client.get_channel(789771971532947486)
-        await pin_channel.send(embed=pin_embed.embed())
-        await msg.channel.send('You got it, bud.')
-    except Exception as ex:
-        print(ex)
-        await msg.channel.send('Ayo, your code is wack.')
+# async def pin_message(msg):
+#     try:
+#         if not msg.reference:
+#             await msg.channel.send('Sorry, bud. Just can\'t do it.')
+#             return
+#         reply = await msg.channel.fetch_message(msg.reference.message_id)
+#         pin_embed = Pin(reply)
+#         pin_channel = client.get_channel(789771971532947486)
+#         await pin_channel.send(embed=pin_embed.embed())
+#         await msg.channel.send('You got it, bud.')
+#     except Exception as ex:
+#         print(ex)
+#         await msg.channel.send('Ayo, your code is wack.')
 
-client.run(TOKEN)
+bot.run(TOKEN)
