@@ -18,5 +18,7 @@ class Pin:
         self.posted_date = formated_date
         self.content = message.content
         self.url = message.jump_url
+        if(len(message.attachments) > 0):
+            self.image = message.attachments[0].url
         self.embed = embedder(self).embed
 

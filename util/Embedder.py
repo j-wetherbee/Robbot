@@ -83,5 +83,10 @@ class PinEmbedder(UserColorEmbedder):
         pin_embed = embed
         pin_embed.set_thumbnail(url=self.pin.avatar)
         pin_embed.add_field(name="Channel", value=self.pin.channel, inline=False)
-        pin_embed.add_field(name="Message", value=f'[{self.pin.content}]({self.pin.url})', inline=False)
+        if(self.pin.image):
+            pin_embed.set_image(url=self.pin.image)
+        if(self.pin.content):
+            pin_embed.add_field(name="Message", value=f'[{self.pin.content}]({self.pin.url})', inline=False)
+        else:
+            pin_embed.add_field(name="Message", value='*This pin had no message*', inline=False)
         return pin_embed
