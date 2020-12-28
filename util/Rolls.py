@@ -3,11 +3,13 @@ import random
 
 
 def rolls_from_args(args: str):
-    if _DNDRoll.args_match_regex(args):
+    args_match = lambda arg_pattern: _RollUtil._args_match_regex(arg_pattern, args)
+
+    if args_match(_DNDRoll.ARG_PATTERN):
         ret = _DNDRoll(args)
-    elif _RangeRoll.args_match_regex(args):
+    elif args_match(_RangeRoll.ARG_PATTERN):
         ret = _RangeRoll(args)
-    elif _ListRoll.args_match_regex(args):
+    elif args_match(_ListRoll.ARG_PATTERN):
         ret = _ListRoll(args)
     elif args == '':
         ret = _RangeRoll('1-100')
@@ -17,7 +19,6 @@ def rolls_from_args(args: str):
     return str(ret) if ret else None
 
 
-# TODO this might be better than the abstract roll class? clear that it doesn't stand alone, and not every roller needs to use it
 class _RollUtil():
     @classmethod
     def _args_match_regex(cls, pattern: str, args: str):
@@ -29,46 +30,21 @@ class _RollUtil():
         matches = re.findall(pattern, args)
         return matches
 
+    # this is kinda tightly coupled, but considering it's an optional helper function following a common
+    #  interface for the Roll classes, I think the reduction in duplicate code is worth it
     @classmethod
-    def parse_args_and_roll(cls, roller, args: str):
-        pattern = roller._arg_pattern
-        matches = cls._findall_matches_in_args(pattern, args)
-        roller._parse_matches(matches)
-        roller.roll()
+    def parse_args_and_roll(cls, arg_pattern: str, parse_arg_matches: callable, roll: callable, args: str):
+        matches = cls._findall_matches_in_args(arg_pattern, args)
+        parse_arg_matches(matches)
+        roll()
 
-class _AbstractRoll():
-    _arg_pattern = None
 
-    @classmethod
-    def _args_match_regex(cls, pattern: str, args: str):
-        match = re.search(pattern, args)
-        return True if match else False
-
-    def __init__(self, args: str):
-        matches = self._findall_matches_in_args(args)
-        self._parse_matches(matches)
-        self.roll()
-    
-    def _findall_matches_in_args(self, args: str):
-        matches = re.findall(self._arg_pattern, args)
-        return matches
-
-    def _parse_matches(self, matches):
-        pass
-
-    def roll(self):
-        pass
-
-class _DNDRoll(_AbstractRoll):  # Names TBD
-    _arg_pattern = r'([0-9]*d[0-9]+)(\+[0-9]+)*'
-
-    @classmethod
-    def args_match_regex(cls, args: str):  # TODO this code is repeated in each subclass - feel like there should be a way to put it all in the abstract and work out the arg_pattern problem with a factory?
-        return super()._args_match_regex(cls._arg_pattern, args)
+class _DNDRoll():  # Names TBD
+    ARG_PATTERN = r'([0-9]*d[0-9]+)(\+[0-9]+)*'
 
     def __init__(self, args: str):
         self.rolls = []
-        super().__init__(args)
+        _RollUtil.parse_args_and_roll(self.ARG_PATTERN, self._parse_matches, self.roll, args)
 
     def _parse_matches(self, matches):
         def parse_num_rolls(roll_match):
@@ -126,16 +102,12 @@ class _DNDRoll(_AbstractRoll):  # Names TBD
         return '\n'.join(rolls)
 
     
-class _RangeRoll(_AbstractRoll):  # Names TBD
-    _arg_pattern = r'[0-9]+-[0-9]+'
-
-    @classmethod
-    def args_match_regex(cls, args: str):
-        return super()._args_match_regex(cls._arg_pattern, args)
+class _RangeRoll():  # Names TBD
+    ARG_PATTERN = r'[0-9]+-[0-9]+'
 
     def __init__(self, args: str):
         self.rolls = []
-        super().__init__(args)
+        _RollUtil.parse_args_and_roll(self.ARG_PATTERN, self._parse_matches, self.roll, args)
         
     def _parse_matches(self, matches):
         for match in matches:
@@ -156,17 +128,13 @@ class _RangeRoll(_AbstractRoll):  # Names TBD
         return '\n'.join(rolls)
 
 
-class _ListRoll(_AbstractRoll):  # Names TBD
-    _arg_pattern = r'\w+'
-
-    @classmethod
-    def args_match_regex(cls, args: str):
-        return super()._args_match_regex(cls._arg_pattern, args)
+class _ListRoll():  # Names TBD
+    ARG_PATTERN = r'\w+'
 
     def __init__(self, args: str):
         self.choices = []
         self.result = None
-        super().__init__(args)
+        _RollUtil.parse_args_and_roll(self.ARG_PATTERN, self._parse_matches, self.roll, args)
 
     def _parse_matches(self, matches):
         self.choices = matches
