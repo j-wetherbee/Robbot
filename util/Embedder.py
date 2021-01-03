@@ -67,7 +67,7 @@ class DrinkEmbedder(Embedder):
         ingredient_string = ""
         for string in self.drink.ingredients:
             ingredient_string += string + '\n'
-        embed.add_field(name="Ingredients", value=self.drink.ingredients, inline=False)
+        embed.add_field(name="Ingredients", value=ingredient_string, inline=False)
         embed.add_field(name="Instructions", value=self.drink.instructions, inline=False)
         embed.set_footer(text="Have ideas for additional functionality? Throw them in #robbot_discussion!")
         return embed
