@@ -2,18 +2,20 @@ import os
 import json
 import random
 import re
-
-import discord
+import requests
 from discord.ext import commands
-
 from dotenv import load_dotenv
-
-from requests.api import get
-from util import Bartender
+from funcs.Bartender import Drink
+from funcs.Pin import Pin
+from util.Request import Request
+from util.Sanitizer import DrinkJsonSanitizer
+from util.Formatter import DrinkFormatter
+from util.Embedder import DrinkEmbedder, PinEmbedder
 from util import Rolls
 
-
 CFG_FILENAME = 'config.json'
+request = Request(requests)
+
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -37,17 +39,44 @@ async def roll(ctx, *args):
     roll = Rolls.rolls_from_args(args_as_str)
     await ctx.send(roll, tts=True)
 
-@bot.command(name='cocktail')
-async def get_cocktail(ctx):
+'''
+@author: Keeth S.
+@desc: Returns a random drink embedded from the Drink object's  embed method
+@retunrs: async message back to channel
+'''
+@bot.command()
+async def drink(ctx):
     try:
-        await ctx.send(embed=Bartender.get_random_drink().embed())
+        drink_json = request.get_drink_json()
+        drink = Drink(drink_json, DrinkJsonSanitizer, DrinkFormatter, DrinkEmbedder)
+        await ctx.send(embed = drink.embed)
     except Exception as ex:
         print(ex)
         await ctx.send('Ayo, your code is wack.')
 
 @bot.command()
-async def drink(ctx):
-    await get_cocktail(ctx)
+async def cocktail(ctx):
+    await drink(ctx)
+
+'''
+@author: Keeth S.
+@desc: Sends a embed to the Pin channel when a user reply's to a message with .pin
+@retunrs: async message back to channel confirming message was pinned
+'''
+@bot.command()
+async def pin(ctx):
+    try:
+        if not ctx.message.reference:
+            await ctx.message.channel.send('You have to reply .pin to the message you want pinned.')
+            return
+        reply = await ctx.message.channel.fetch_message(ctx.message.reference.message_id)
+        pin = Pin(reply, PinEmbedder)
+        pin_channel = bot.get_channel(789771971532947486)
+        await pin_channel.send(embed=pin.embed)
+        await ctx.message.channel.send('You got it, bud.')
+    except Exception as ex:
+        print(ex)
+        await ctx.message.channel.send('Ayo, your code is wack.')
 
 @bot.command()
 async def test(ctx):
@@ -71,5 +100,9 @@ async def check_react_ohwow(message):
             if emoji.name == 'ohwow':
                 await message.add_reaction(emoji)
 
+
+async def get_cocktail(msg):
+
+    pass
 
 bot.run(TOKEN)
