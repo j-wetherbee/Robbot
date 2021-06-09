@@ -1,8 +1,36 @@
 from .Configurable import Configurable
 
+class UserColors(Configurable):
+    def __init__(self):
+        Configurable.__init__(self)
+        self._user_color_list = self._get_user_color_list()
+        self.brady = self._user_color_list['Brady']
+        self.carlie = self._user_color_list['Carlie']
+        self.derick = self._user_color_list['Derick']
+        self.keeth = self._user_color_list['Keeth']
+        self.james = self._user_color_list['James']
+        self.rob = self._user_color_list['Rob']
+        self.robbot = self._user_color_list['Robbot']
+    
+    def _get_user_color_list(self):
+        user_color_list = {}
+        
+        for guid, obj in self._file['users'].items():
+            user_color_list[obj['name']] = obj['embed_color']
+        return user_color_list
+    
+    def get_user_color(self, guid: str):
+        if guid is not None:
+            guid = str(guid)
+            
+        __user_list = self._file['users']
+        if guid in __user_list:
+            return __user_list[guid]['embed_color']
+
 class Colors(Configurable):
     def __init__(self):
         Configurable.__init__(self)
+        self.user_colors = UserColors()
         self._color_list = self._file['colors']
         self.aqua = self._get_color('AQUA')
         self.green = self._get_color('GREEN')
