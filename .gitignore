@@ -109,6 +109,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+robbot-env
 
 # Spyder project settings
 .spyderproject
@@ -127,3 +128,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Jupyter Lab Testing Grounds
+jupyter
+
+
+# Vs Code Files
+.vscode
