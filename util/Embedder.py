@@ -1,52 +1,14 @@
-from discord import Embed
+from discord import Embed, user
 
 class Embedder():
-        def __init__(self):
-                self.colors = {
-                    'DEFAULT': 0,
-                    'AQUA': 1752220,
-                    'GREEN': 3066993,
-                    'BLUE': 3447003,
-                    'PURPLE': 10181046,
-                    'GOLD': 15844367,
-                    'ORANGE': 15105570,
-                    'RED': 15158332,
-                    'GREY': 9807270,
-                    'DARKER_GREY': 8359053,
-                    'NAVY': 3426654,
-                    'DARK_AQUA': 1146986,
-                    'DARK_GREEN': 2067276,
-                    'DARK_BLUE': 2123412,
-                    'DARK_PURPLE': 7419530,
-                    'DARK_GOLD': 12745742,
-                    'DARK_ORANGE': 11027200,
-                    'DARK_RED': 10038562,
-                    'DARK_GREY': 9936031,
-                    'LIGHT_GREY': 12370112,
-                    'DARK_NAVY': 2899536,
-                    'LUMINOUS_VIVID_PINK': 16580705,
-                    'DARK_VIVID_PINK': 12320855
-                }
+        def __init__(self, colors):
+                self.colors = colors
 
 class UserColorEmbedder(Embedder):
-    def __init__(self):
-        Embedder.__init__(self)
-        self.user_colors = {
-                    #Brady - Gold
-                    178851504076095488: 15844367,
-                    #Carlie - Purple
-                    323968599687430145: 10181046,
-                    #James - Grey
-                    191384926321508353: 9807270,
-                    #Derick - Blue
-                    179051738354024449: 3447003,
-                    #Keeth - Red
-                    636724139922554893: 15158332,
-                    #Rob - Orange
-                    209101464944115713: 15105570,
-                    #Robbot - Luminous Vivid Pink
-                    422470851435298818: 16580705
-                }
+    def __init__(self, user_colors):
+        Embedder.__init__(self, user_colors)
+        self.user_colors = user_colors
+
 
 class DrinkEmbedder(Embedder):
 
@@ -73,9 +35,9 @@ class DrinkEmbedder(Embedder):
         return embed
 
 class PinEmbedder(UserColorEmbedder):
-    def __init__(self, pin):
+    def __init__(self, pin, colors):
         self.pin = pin
-        UserColorEmbedder.__init__(self)
+        UserColorEmbedder.__init__(self, colors)
         embed = Embed(title=self.pin.author, description=f'Posted on {self.pin.posted_date}', color=self.user_colors.get(self.pin.id))
         self.embed = self.embed_pin(embed)
 
