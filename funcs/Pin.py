@@ -20,5 +20,7 @@ class Pin:
         self.url = message.jump_url
         if(len(message.attachments) > 0):
             self.image = message.attachments[0].url
+        else:
+            self.image = None
         self.embed = embedder(self).embed
 

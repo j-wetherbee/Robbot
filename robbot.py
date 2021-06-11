@@ -76,7 +76,7 @@ async def pin(ctx):
         await ctx.message.channel.send('You got it, bud.')
     except Exception as ex:
         print(ex)
-        await ctx.message.channel.send('Ayo, your code is wack.')
+        await ctx.message.channel.send(f'Ayo, your code is wack.\n Error: {ex}')
 
 @bot.command()
 async def test(ctx):

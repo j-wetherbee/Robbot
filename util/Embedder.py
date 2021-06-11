@@ -1,21 +1,11 @@
-from discord import Embed, user
+from discord import Embed
+from .Colors import Colors
 
-class Embedder():
-        def __init__(self, colors):
-                self.colors = colors
-
-class UserColorEmbedder(Embedder):
-    def __init__(self, user_colors):
-        Embedder.__init__(self, user_colors)
-        self.user_colors = user_colors
-
-
-class DrinkEmbedder(Embedder):
+class DrinkEmbedder():
 
     def __init__(self, drink):
         self.drink = drink
-        Embedder.__init__(self)
-        embed = Embed(title=self.drink.name, description='A drink for you, good Bud.', color=self.colors.get('DARK_NAVY'))
+        embed = Embed(title=self.drink.name, description='A drink for you, good Bud.', color=Colors().dark_navy)
         self.embed = self.embed_drink(embed)
         
     def embed_drink(self, embed):
@@ -34,20 +24,19 @@ class DrinkEmbedder(Embedder):
         embed.set_footer(text="Have ideas for additional functionality? Throw them in #robbot_discussion!")
         return embed
 
-class PinEmbedder(UserColorEmbedder):
-    def __init__(self, pin, colors):
+class PinEmbedder():
+    def __init__(self, pin):
         self.pin = pin
-        UserColorEmbedder.__init__(self, colors)
-        embed = Embed(title=self.pin.author, description=f'Posted on {self.pin.posted_date}', color=self.user_colors.get(self.pin.id))
+        embed = Embed(title=self.pin.author, description=f'Posted on {self.pin.posted_date}', color=int(Colors().user_colors.get_user_color(self.pin.id)))
         self.embed = self.embed_pin(embed)
 
     def embed_pin(self, embed):
         pin_embed = embed
         pin_embed.set_thumbnail(url=self.pin.avatar)
         pin_embed.add_field(name="Channel", value=self.pin.channel, inline=False)
-        if(self.pin.image):
+        if(self.pin.image is not None):
             pin_embed.set_image(url=self.pin.image)
-        if(self.pin.content):
+        if(self.pin.content is not None):
             pin_embed.add_field(name="Message", value=f'[{self.pin.content}]({self.pin.url})', inline=False)
         else:
             pin_embed.add_field(name="Message", value='*This pin had no message*', inline=False)
