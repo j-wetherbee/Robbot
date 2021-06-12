@@ -1,5 +1,11 @@
 from .Configurable import Configurable
 
+
+'''
+@author: Keeth S.
+@desc: Configuration Child Object which stores the color values for each 
+        user in the server
+'''
 class UserColors(Configurable):
     def __init__(self):
         Configurable.__init__(self)
@@ -27,6 +33,12 @@ class UserColors(Configurable):
         if guid in __user_list:
             return __user_list[guid]['embed_color']
 
+
+'''
+@author: Keeth S.
+@desc: Configuration Child which stores the values of 
+        colors which can be accessed globally.
+'''
 class Colors(Configurable):
     def __init__(self):
         Configurable.__init__(self)

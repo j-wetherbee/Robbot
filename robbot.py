@@ -3,6 +3,7 @@ import json
 import random
 import re
 import requests
+import traceback
 from discord.ext import commands
 from dotenv import load_dotenv
 from funcs.Bartender import Drink
@@ -39,11 +40,6 @@ async def roll(ctx, *args):
     roll = Rolls.rolls_from_args(args_as_str)
     await ctx.send(roll, tts=True)
 
-'''
-@author: Keeth S.
-@desc: Returns a random drink embedded from the Drink object's  embed method
-@retunrs: async message back to channel
-'''
 @bot.command()
 async def drink(ctx):
     try:
@@ -51,18 +47,13 @@ async def drink(ctx):
         drink = Drink(drink_json, DrinkJsonSanitizer, DrinkFormatter, DrinkEmbedder)
         await ctx.send(embed = drink.embed)
     except Exception as ex:
-        print(ex)
-        await ctx.send('Ayo, your code is wack.')
+        traceback.print_exc()
+        await ctx.send(f'Ayo, your code is wack.\n Error: {ex}')
 
 @bot.command()
 async def cocktail(ctx):
     await drink(ctx)
 
-'''
-@author: Keeth S.
-@desc: Sends a embed to the Pin channel when a user reply's to a message with .pin
-@retunrs: async message back to channel confirming message was pinned
-'''
 @bot.command()
 async def pin(ctx):
     try:
@@ -76,6 +67,7 @@ async def pin(ctx):
         await ctx.message.channel.send('You got it, bud.')
     except Exception as ex:
         print(ex)
+        traceback.print_exc()
         await ctx.message.channel.send(f'Ayo, your code is wack.\n Error: {ex}')
 
 @bot.command()

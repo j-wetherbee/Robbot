@@ -1,5 +1,10 @@
 import json
 
+
+'''
+@author: Keeth S.
+@desc: Parent Configuration object used to store the config file
+'''
 class Configurable():
     def __init__(self):
         self._file = self._get_config_file()

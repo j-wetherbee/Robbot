@@ -1,10 +1,11 @@
 '''
 @author: Keeth S.
-@dependencies: discord, datetime
+@params: [
+    message: discord.Messaage
+    embedder: util.PinEmbedder
+]
 @desc: Creates a Pin object from the reply message served from robbot.py
 @retunrs: async message back to channel confirming message was pinned
-# TODO Make JSON file to save colors for users
-       Allow users to customize their pin color 
 '''
 import datetime
 
