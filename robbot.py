@@ -40,7 +40,7 @@ async def roll(ctx, *args):
     roll = Rolls.rolls_from_args(args_as_str)
     await ctx.send(roll, tts=True)
 
-@bot.command()
+@bot.command(name='drink', aliases=['drinks', 'cocktail', 'cocktails'])
 async def drink(ctx):
     try:
         drink_json = request.get_drink_json()
@@ -49,10 +49,6 @@ async def drink(ctx):
     except Exception as ex:
         traceback.print_exc()
         await ctx.send(f'Ayo, your code is wack.\n Error: {ex}')
-
-@bot.command()
-async def cocktail(ctx):
-    await drink(ctx)
 
 @bot.command()
 async def pin(ctx):

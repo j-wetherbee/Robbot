@@ -19,7 +19,7 @@ class Sanitizer:
 class DrinkJsonSanitizer(Sanitizer):
     
 
-    def __init__(self, json: dict, request):
+    def __init__(self, json: dict):
         Sanitizer.__init__(self, json)
     
 
