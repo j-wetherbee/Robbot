@@ -1,21 +1,16 @@
 import os
 import json
 import random
-import re
 import requests
 import traceback
 from discord.ext import commands
 from dotenv import load_dotenv
-from funcs.Bartender import Drink
-from funcs.Pin import Pin
-from util.Request import Request
-from util.Sanitizer import DrinkJsonSanitizer
-from util.Formatter import DrinkFormatter
-from util.Embedder import DrinkEmbedder, PinEmbedder
+from models.Pin import Pin
+from util import Utility
 from util import Rolls
 
 CFG_FILENAME = 'config.json'
-request = Request(requests)
+request = Utility.Request()
 
 
 load_dotenv()
@@ -27,6 +22,32 @@ with open(CFG_FILENAME) as cfg:
 
 bot = commands.Bot(command_prefix='.')
 
+'''
+    Cog Functions & Commands
+'''
+def load_cogs():
+    for files in os.listdir('./cogs'):
+        if files.endswith('.py'):              
+            bot.load_extension(f'cogs.{files[:-3]}')
+            print(f'{files[:-3]} extension loaded')
+
+def unload_cogs():
+    for files in os.listdir('./cogs'):
+        if files.endswith('.py'):              
+            bot.unload_extension(f'cogs.{files[:-3]}')
+            print(f'{files[:-3]} extension unloaded')
+
+@bot.command(name='refresh', description='Reloads all cogs', alais=['refresh, reload'])
+async def refresh(ctx):
+    print('Reloading Cogs...\n')
+    unload_cogs()
+    load_cogs()
+    print('Cogs reloaded successfully')
+
+
+'''
+    TODO: Create Cogs for the follow commands
+'''
 @bot.command(name='8ball')
 async def shake_8ball(ctx):
     responses = CFG['8ball_responses']
@@ -39,36 +60,6 @@ async def roll(ctx, *args):
 
     roll = Rolls.rolls_from_args(args_as_str)
     await ctx.send(roll, tts=True)
-
-@bot.command(name='drink', aliases=['drinks', 'cocktail', 'cocktails'])
-async def drink(ctx):
-    try:
-        drink_json = request.get_drink_json()
-        drink = Drink(drink_json, DrinkJsonSanitizer, DrinkFormatter, DrinkEmbedder)
-        await ctx.send(embed = drink.embed)
-    except Exception as ex:
-        traceback.print_exc()
-        await ctx.send(f'Ayo, your code is wack.\n Error: {ex}')
-
-@bot.command()
-async def pin(ctx):
-    try:
-        if not ctx.message.reference:
-            await ctx.message.channel.send('You have to reply .pin to the message you want pinned.')
-            return
-        reply = await ctx.message.channel.fetch_message(ctx.message.reference.message_id)
-        pin = Pin(reply, PinEmbedder)
-        pin_channel = bot.get_channel(789771971532947486)
-        await pin_channel.send(embed=pin.embed)
-        await ctx.message.channel.send('You got it, bud.')
-    except Exception as ex:
-        print(ex)
-        traceback.print_exc()
-        await ctx.message.channel.send(f'Ayo, your code is wack.\n Error: {ex}')
-
-@bot.command()
-async def test(ctx):
-    await ctx.send('.test')
 
 @bot.event
 async def on_ready():
@@ -89,8 +80,5 @@ async def check_react_ohwow(message):
                 await message.add_reaction(emoji)
 
 
-async def get_cocktail(msg):
-
-    pass
-
+load_cogs()
 bot.run(TOKEN)
