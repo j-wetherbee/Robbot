@@ -1,7 +1,6 @@
 import json
 import requests    
 from discord import Embed
-from .Colors import Colors
 
 #region Configuration
 '''
@@ -61,7 +60,6 @@ class Formatter():
         and measurments of a drink
 '''
 class DrinkFormatter(Formatter):
-    
 
     def __init__(self, json: dict):
         if(isinstance(json, dict) != True):

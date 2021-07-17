@@ -9,6 +9,7 @@ from models.Pin import Pin
 from util import Utility
 from util import Rolls
 
+
 CFG_FILENAME = 'config.json'
 request = Utility.Request()
 
