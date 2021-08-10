@@ -11,17 +11,19 @@ class Pinner(commands.Cog, name='Pinner', description='Used to pin a Message to 
         self._embedder = Utility.PinEmbedder
 
 
-    @commands.command(name='pin', description='Reply to a message with this command to pin it to the Pin channel', aliases=['pin, this'])
-    async def pin(self, ctx):
+
+    @commands.command(name='pin', description='Reply to a message with this command to pin it to the Pin channel', aliases=['this'])
+    async def pin(self, ctx: commands.Context):
         try:
             if not ctx.message.reference:
                 await ctx.message.channel.send('You have to reply .pin to the message you want pinned.')
                 return
+            
             reply = await ctx.message.channel.fetch_message(ctx.message.reference.message_id)
+            
             pin = self._pin(reply, self._embedder)
-            pin_channel = self.bot.get_channel(789771971532947486)
+            pin_channel = self.bot.get_channel(Utility.Channels.PINS.value)
             emoji = '<:bigfoot:468234675622641674>'
-            print(f'emoji = {emoji}')
             await pin_channel.send(embed=pin.embed)
             await ctx.message.add_reaction(emoji)
         except Exception as ex:

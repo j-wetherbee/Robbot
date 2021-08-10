@@ -1,6 +1,7 @@
 import os
 import json
 import random
+import discord
 import requests
 import traceback
 from discord.ext import commands
@@ -8,7 +9,6 @@ from dotenv import load_dotenv
 from models.Pin import Pin
 from util import Utility
 from util import Rolls
-
 
 CFG_FILENAME = 'config.json'
 request = Utility.Request()
@@ -39,11 +39,13 @@ def unload_cogs():
             print(f'{files[:-3]} extension unloaded')
 
 @bot.command(name='refresh', description='Reloads all cogs', alais=['refresh, reload'])
-async def refresh(ctx):
+async def refresh(ctx: commands.Context):
     print('Reloading Cogs...\n')
     unload_cogs()
     load_cogs()
     print('Cogs reloaded successfully')
+    reaction = '👍'
+    await ctx.message.add_reaction(reaction)
 
 
 '''

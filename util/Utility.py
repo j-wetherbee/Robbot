@@ -1,5 +1,6 @@
 import json
 import requests    
+from enum import Enum
 from discord import Embed
 
 #region Configuration
@@ -30,11 +31,11 @@ class Request:
     def __init__(self):
         self._requests = requests
         self.urls = {
-            "cocktail_db_api": 'https://www.thecocktaildb.com/api/json/v1/1/random.php'
+            "cocktail_db_api": 'https://www.thecocktaildb.com/api/json/v1/1/random.php',
         }
     
     def get_drink_json(self):
-        return self._requests.get(self.urls['cocktail_db_api']).json()['drinks'][0]   
+        return self._requests.get(self.urls['cocktail_db_api']).json()['drinks'][0]
 #endregion
 
 #region Formatter
@@ -244,4 +245,43 @@ class Colors(Configurable):
 
     def _get_color(self, color):
         return self._color_list[color]
+#endregion
+
+#region Channels
+'''
+@author: Keeth S.
+@desc: Enum of all Channel ids
+'''
+class Channels(Enum):
+        JERIFISSHU = 208694891486773248
+        NSFW = 324699837297721344
+        JAZZ_ZONE = 335923711662227456
+        GAME_IDEAS = 842496144603873291
+        SHITPOST = 413881959857520640
+        DND = 790011375220162590
+        SET_AND_BETS = 580583079597572096
+        BUDS_N_CRAFT = 804897670065815552
+        BUD_COURT = 796190794334732298
+        NEW_CHANEL_OLD = 796187591162069003
+        CUM_CHANNEL = 819458956606439424
+        NEW_CHANNEL = 872613001709113414
+        MUSIC_QUEUE = 741139638072246323
+        GAMING_ZONE = 380181785390088203
+        DEBATE_ZONE = 786065089367113728
+        AFK = 291414646189981696
+        PINS = 789771971532947486
+        HALL_OF_FAME = 833063954602786836
+#endregion
+
+#region Channels
+'''
+@author: Keeth S.
+@desc: Enum of all Role ids
+'''
+class Roles(Enum):
+    PATRIARCH = 290567553510539264
+    CAPTAIN = 290566787580428288
+    DEV = 789929955743236106
+    LIEUTENANT = 290566792760262656
+    FUCKBOY = 323617141054111756
 #endregion
