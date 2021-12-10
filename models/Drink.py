@@ -1,18 +1,17 @@
+from services.Embedder import DrinkEmbedder
+from services.Sanitizer import DrinkSanitizer
+
 '''
-@author: Keeth S.
-@params: [
-    json: dict
-    sanitizer: util.Sanitizer.DrinkJsonSanitizer
-    formatter: util.DrinkFormatter
-    embedder: util.DrinkEmbeder
-]
-@desc: Creates a Drink Object used to embed an ice cold brew
+Drink Object
+    Processes json data retrieved from the request object and
+    stores a Discord.Embed object
+
+    TODO: Consider rewriting this as a functional module vs a Class
 '''
 class Drink():
 
-    def __init__(self, json, sanitizer, embedder):
-        self._sanitizer = sanitizer(json)
-        _json = self._sanitizer.clean_json()
+    def __init__(self, drink_json: dict, embedder: DrinkEmbedder, sanitizer: DrinkSanitizer):
+        _json = sanitizer.clean_filth(drink_json)
         self._img = _json.get('strDrinkThumb')
         self._name = _json.get('strDrink')
         self._category = _json.get('strCategory')
@@ -20,9 +19,9 @@ class Drink():
         self._glass = _json.get('strGlass')
         self._ingredients_string = self.__get_ingredient_string(_json)
         self._instructions = _json.get('strInstructions')
-        self.embed = embedder(self).embed
+        self.embed = embedder.embed(self)
 
-    def __get_ingredient_string(json) -> list:
+    def __get_ingredient_string(self, json) -> list:
         ingredients = [json.get(ing) for ing in json if 'Ingredient' in ing and json.get(ing) is not None]
         measurements = [json.get(measure) for measure in json if 'Measure' in measure and json.get(measure) is not None]
         

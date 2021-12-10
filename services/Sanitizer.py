@@ -10,11 +10,9 @@ class Sanitizer(ABC):
         pass
 
 class DrinkSanitizer(Sanitizer):
-    
-    def __init__(self, json=None):
-        Sanitizer.__init__(self, json)
-    
-    def clean_filth(self, json: dict):
+
+    @staticmethod    
+    def clean_filth(json: dict):
         drink_dict = {}
         for key in json:
             if(json[key] != None):

@@ -1,14 +1,15 @@
 import traceback
 from models.Pin import Pin
 from discord.ext import commands
-from util import Utility
+import services.Embedder as embedder
 
 class Pinner(commands.Cog, name='Pinner', description='Used to pin a Message to the Pin Channel'):
-    
+    factory_type = 'pin'
+
     def __init__(self, bot):
         self.bot = bot
         self._pin = Pin
-        self._embedder = Utility.PinEmbedder
+        self._embedder = embedder.EmbedderFactory.get_embedder(Pinner.factory_type)
 
 
 

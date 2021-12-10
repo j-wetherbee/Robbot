@@ -1,12 +1,8 @@
 import os
 import json
 import random
-import discord
-import requests
-import traceback
 from discord.ext import commands
 from dotenv import load_dotenv
-from models.Pin import Pin
 from util import Utility
 from util import Rolls
 

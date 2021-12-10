@@ -1,7 +1,6 @@
 import json
 import requests    
 from enum import Enum
-from discord import Embed
 
 #region Configuration
 '''
