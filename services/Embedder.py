@@ -1,27 +1,19 @@
 from abc import ABC, abstractmethod
 from discord import Embed
 from util.Utility import Colors
+
 #region Embedder
-'''
-@author: Keeth S.
-@params: filth: Object which needs to be sanitized
-@desc: Parent Sanitizer Class
-'''
 class Embedder(ABC):
     
     @abstractmethod
-    def embed(filth):
-        ''' Cleans the incoming filth data for the given sanitizer object '''
-'''
-@author: Keeth S.
-@params: drink: Drink object to be embedded
-@desc: Embedder which creates and sets an embed with
-        information from the Drink object
-'''
+    def embed(_object) -> Embed:
+        ''' Takes the data in _object and returns a customized Discord.Embed object'''
+        pass
+
 class DrinkEmbedder(Embedder):
     
     @staticmethod
-    def embed(drink):
+    def embed(drink) -> Embed:
 
         embed = Embed(title= drink._name, description='A drink for you, good Bud.', color=Colors().dark_navy)
         embed.set_image(url= drink._img)
@@ -39,17 +31,10 @@ class DrinkEmbedder(Embedder):
         embed.set_footer(text="Have ideas for additional functionality? Throw them in #robbot_discussion!")
         return embed
 
-
-'''
-@author: Keeth S.
-@params: pin: Pin object to be embedded
-@desc: Embedder which creates and sets an embed with
-        information from the Pin object
-'''
 class PinEmbedder(Embedder):
 
     @staticmethod
-    def embed(pin):
+    def embed(pin) -> Embed:
         embed = Embed(title=pin.author, description=f'Posted on {pin.posted_date}', color=int(Colors().user_colors.get_user_color(pin.id)))
         pin_embed = embed
         pin_embed.set_thumbnail(url=pin.avatar)
@@ -69,7 +54,7 @@ class EmbedderFactory:
     }
     
     @staticmethod
-    def get_embedder(type: str):
+    def get_embedder(type: str) -> Embedder:
         if type in EmbedderFactory.embedders:
             return EmbedderFactory.embedders[type]()
         else:

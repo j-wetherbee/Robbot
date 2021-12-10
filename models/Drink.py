@@ -10,19 +10,34 @@
 '''
 class Drink():
 
-
-    def __init__(self, json, sanitizer, formatter, embedder):
+    def __init__(self, json, sanitizer, embedder):
         self._sanitizer = sanitizer(json)
         _json = self._sanitizer.clean_json()
-        self._formatter = formatter(_json)
         self._img = _json.get('strDrinkThumb')
         self._name = _json.get('strDrink')
         self._category = _json.get('strCategory')
         self._alcoholic = _json.get('strAlcoholic')
         self._glass = _json.get('strGlass')
-        self._ingredients_string = self._formatter.ingredients_string
+        self._ingredients_string = self.__get_ingredient_string(_json)
         self._instructions = _json.get('strInstructions')
         self.embed = embedder(self).embed
+
+    def __get_ingredient_string(json) -> list:
+        ingredients = [json.get(ing) for ing in json if 'Ingredient' in ing and json.get(ing) is not None]
+        measurements = [json.get(measure) for measure in json if 'Measure' in measure and json.get(measure) is not None]
+        
+        if(len(measurements) == 0):
+            return ingredients
+        
+        ingredient_list = []
+        for i in range(len(ingredients)):
+            if(i < len(measurements)):
+                ingredient_list.append(measurements[i].strip() + " " + ingredients[i])
+            elif(ingredients[i] == ' '):
+                pass
+            else:
+                ingredient_list.append(ingredients[i])
+        return ingredient_list
         
         
     def __repr__(self):
