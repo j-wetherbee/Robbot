@@ -18,10 +18,10 @@ class Embedder(ABC):
 @desc: Embedder which creates and sets an embed with
         information from the Drink object
 '''
-class DrinkEmbedder(Embeder):
+class DrinkEmbedder(Embedder):
     
     @staticmethod
-    def embed(self, drink):
+    def embed(drink):
 
         embed = Embed(title= drink._name, description='A drink for you, good Bud.', color=Colors().dark_navy)
         embed.set_image(url= drink._img)
@@ -49,7 +49,7 @@ class DrinkEmbedder(Embeder):
 class PinEmbedder(Embedder):
 
     @staticmethod
-    def embed(self, pin):
+    def embed(pin):
         embed = Embed(title=pin.author, description=f'Posted on {pin.posted_date}', color=int(Colors().user_colors.get_user_color(pin.id)))
         pin_embed = embed
         pin_embed.set_thumbnail(url=pin.avatar)
@@ -69,7 +69,7 @@ class EmbedderFactory:
     }
     
     @staticmethod
-    def get_sanitizer(type: str):
+    def get_embedder(type: str):
         if type in EmbedderFactory.embedders:
             return EmbedderFactory.embedders[type]()
         else:
