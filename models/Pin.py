@@ -1,16 +1,16 @@
-'''
-@author: Keeth S.
-@params: [
-    message: discord.Messaage
-    embedder: util.PinEmbedder
-]
-@desc: Creates a Pin object from the reply message served from robbot.py
-@retunrs: async message back to channel confirming message was pinned
-'''
 import datetime
+from abc import ABC, abstractmethod
+from discord import Message
+from services.Embedder import PinEmbedder
 
+'''
+Pin Objects
+    State is set by the message being pinned. Structure of the
+    object is determined 
+'''
 class Pin:
-    def __init__(self, message, embedder):
+    def __init__(self, message, embedder: PinEmbedder):
+
         self.author = message.author.display_name
         self.id = message.author.id
         self.avatar = message.author.avatar_url
@@ -19,9 +19,12 @@ class Pin:
         self.posted_date = formated_date
         self.content = message.content
         self.url = message.jump_url
+        
+        self.image = None
         if(len(message.attachments) > 0):
             self.image = message.attachments[0].url
+        if len(message.embeds) > 0:
+            self.embed = message.embeds
         else:
-            self.image = None
-        self.embed = embedder(self).embed
-
+            embeds = [embedder.embed(self)]
+            self.embed = embeds

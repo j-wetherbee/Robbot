@@ -50,7 +50,7 @@ class PinEmbedder(Embedder):
 class EmbedderFactory:
     embedders = {
         "drink": DrinkEmbedder,
-        "pin": PinEmbedder
+        "pin": PinEmbedder,
     }
     
     @staticmethod
