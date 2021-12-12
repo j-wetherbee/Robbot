@@ -18,17 +18,6 @@ class Configurable():
         return CFG
 #endregion
 
-#region Request
-'''
-@author: Keeth S.
-@parms: requests: requests module object
-@desc: Object used to get resources outside of the config file
-@TODO: Move urls to config file / Make url entries into attributes /
-        Abstract Request as Parent classs(?)
-'''
-
-#endregion
-
 #region Colors
 '''
 @author: Keeth S.

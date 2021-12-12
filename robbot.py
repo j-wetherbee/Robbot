@@ -7,7 +7,6 @@ from util import Rolls
 
 CFG_FILENAME = 'config.json'
 
-
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
