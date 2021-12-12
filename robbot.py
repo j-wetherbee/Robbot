@@ -3,11 +3,9 @@ import json
 import random
 from discord.ext import commands
 from dotenv import load_dotenv
-from util import Utility
 from util import Rolls
 
 CFG_FILENAME = 'config.json'
-request = Utility.Request()
 
 
 load_dotenv()
@@ -34,7 +32,7 @@ def unload_cogs():
             bot.unload_extension(f'cogs.{files[:-3]}')
             print(f'{files[:-3]} extension unloaded')
 
-@bot.command(name='refresh', description='Reloads all cogs', alais=['refresh, reload'], hidden=True)
+@bot.command(name='refresh', description='Reloads all cogs', aliases=['reload'], hidden=True)
 async def refresh(ctx: commands.Context):
     print('Reloading Cogs...\n')
     unload_cogs()
@@ -42,7 +40,6 @@ async def refresh(ctx: commands.Context):
     print('Cogs reloaded successfully')
     reaction = '👍'
     await ctx.message.add_reaction(reaction)
-
 
 '''
     TODO: Create Cogs for the follow commands
