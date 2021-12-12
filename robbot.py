@@ -3,8 +3,13 @@ import json
 import random
 import re
 import requests
+import asyncio
+import datetime
+
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+
 from funcs.Bartender import Drink
 from funcs.Pin import Pin
 from util.Request import Request
@@ -24,19 +29,33 @@ with open(CFG_FILENAME) as cfg:
     CFG = json.load(cfg)
 
 
-bot = commands.Bot(command_prefix='.')
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('.'))
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+
+@bot.event
+async def on_message(message):
+    await check_react_ohwow(message)
+
+    await bot.process_commands(message)
+    return
 
 @bot.command(name='8ball')
 async def shake_8ball(ctx):
-    responses = CFG['8ball_responses']
-    response = random.choice(responses)
-    await ctx.send(response)
+    async with ctx.typing():
+        responses = CFG['8ball_responses']
+        response = random.choice(responses)
+
+    await ctx.send(response, tts=True)
 
 @bot.command(name='roll')
 async def roll(ctx, *args):
-    args_as_str = ' '.join(args)
+    async with ctx.typing():
+        args_as_str = ' '.join(args)
+        roll = Rolls.rolls_from_args(args_as_str)
 
-    roll = Rolls.rolls_from_args(args_as_str)
     await ctx.send(roll, tts=True)
 
 '''
@@ -77,28 +96,6 @@ async def pin(ctx):
     except Exception as ex:
         print(ex)
         await ctx.message.channel.send('Ayo, your code is wack.')
-
-@bot.command()
-async def test(ctx):
-    await ctx.send('.test')
-
-@bot.event
-async def on_ready():
-    print(f'{bot.user} has connected to Discord!')
-
-@bot.event
-async def on_message(message):
-    await check_react_ohwow(message)
-
-    await bot.process_commands(message)
-    
-    return
-
-async def check_react_ohwow(message):
-    if 'oh wow' in message.content.lower():
-        for emoji in bot.emojis:
-            if emoji.name == 'ohwow':
-                await message.add_reaction(emoji)
 
 
 async def get_cocktail(msg):
