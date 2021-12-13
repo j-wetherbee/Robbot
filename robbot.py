@@ -20,16 +20,18 @@ bot = commands.Bot(command_prefix='.')
     Cog Functions & Commands
 '''
 def load_cogs():
-    for files in os.listdir('./cogs'):
-        if files.endswith('.py'):              
-            bot.load_extension(f'cogs.{files[:-3]}')
-            print(f'{files[:-3]} extension loaded')
+    for file in os.listdir('./cogs'):
+        if file.endswith('.py'):       
+            cog_name, file_extension = os.path.splitext(file)             
+            bot.load_extension(f'cogs.{cog_name}')
+            print(f'{cog_name} extension loaded')
 
 def unload_cogs():
-    for files in os.listdir('./cogs'):
-        if files.endswith('.py'):              
-            bot.unload_extension(f'cogs.{files[:-3]}')
-            print(f'{files[:-3]} extension unloaded')
+    for file in os.listdir('./cogs'):
+        if file.endswith('.py'): 
+            cog_name, file_extension = os.path.splitext(file)             
+            bot.unload_extension(f'cogs.{cog_name}')
+            print(f'{cog_name} extension unloaded')
 
 @bot.command(name='refresh', description='Reloads all cogs', aliases=['reload'], hidden=True)
 async def refresh(ctx: commands.Context):
