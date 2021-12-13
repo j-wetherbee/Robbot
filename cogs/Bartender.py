@@ -12,7 +12,7 @@ class Bartender(commands.Cog, name='Bartender', description='Used to provide any
         self._sanitizer = Sanitizer.SantizerFactory.get_sanitizer(Bartender.factory_type)
         self._embedder = Embedder.EmbedderFactory.get_embedder(Bartender.factory_type)
     
-    @commands.command(name='drink', description='Get a nice, freshing drink from the Bartender',aliases=['drinks', 'cocktail', 'cocktails'])
+    @commands.command(name='drink', description='Get a nice, refreshing drink from the Bartender',aliases=['drinks', 'cocktail', 'cocktails'])
     async def drink(self, ctx):
         try:
             json = self._request.fetch()
