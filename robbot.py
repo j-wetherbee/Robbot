@@ -123,12 +123,8 @@ async def _download_msgs(ctx):
         # get data directory
         script_dir = os.path.dirname(__file__)
         guild_name = "".join(x for x in ctx.guild.name if x.isalnum())  # need to sanitize ':', etc
-        data_dir = os.path.join(script_dir, f"data/{guild_name}_{ctx.guild.id}")
+        data_dir = os.path.join(script_dir, f"data/{guild_name}_{ctx.guild.id}/{filename}")
         data_dir = os.path.abspath(data_dir)
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
-
-        filename = os.path.join(data_dir, filename)
         
         with open(filename, 'w+') as f:
             messages = {}
