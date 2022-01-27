@@ -50,6 +50,7 @@ def unload_cogs():
 
 @bot.command(name='refresh', description='Reloads all cogs', aliases=['reload'], hidden=True)
 async def refresh(ctx: commands.Context):
+    print(Color.red().value)
     print('Reloading Cogs...\n')
     unload_cogs()
     load_cogs()

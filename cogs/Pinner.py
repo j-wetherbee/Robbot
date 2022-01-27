@@ -1,16 +1,17 @@
-from re import L
 import traceback
 from discord.ext import commands
 from models.Pin import Pin
 from services import Embedder
-from util.Utility import Channels
+
 
 class Pinner(commands.Cog, name='Pinner', description='Used to pin a Message to the Pin Channel'):
-    factory_type = 'pin'
+    PIN_CHANNEL_ID = 789771971532947486
+    PIN_REACTION = '<:bigfoot:468234675622641674>'
+    FACTORY_TYPE = 'pin'
 
     def __init__(self, bot):
         self.bot = bot
-        self._embedder = Embedder.EmbedderFactory.get_embedder(Pinner.factory_type)
+        self._embedder = Embedder.EmbedderFactory.get_embedder(Pinner.FACTORY_TYPE)
 
     @commands.command(name='pin', description='Reply to a message with this command to pin it to the Pin channel', aliases=['this'])
     async def pin(self, ctx: commands.Context):
@@ -19,15 +20,14 @@ class Pinner(commands.Cog, name='Pinner', description='Used to pin a Message to 
                 await ctx.message.channel.send('You have to reply .pin to the message you want pinned.')
                 return
             
-            pin_channel = self.bot.get_channel(Channels.PINS.value)
+            pin_channel = self.bot.get_channel(Pinner.PIN_CHANNEL_ID)
             reply = await ctx.message.channel.fetch_message(ctx.message.reference.message_id)
 
             pin = Pin(reply, self._embedder)
             for embed in pin.embed:
                 await pin_channel.send(embed=embed)
 
-            emoji = '<:bigfoot:468234675622641674>'
-            await ctx.message.add_reaction(emoji)
+            await ctx.message.add_reaction(Pinner.PIN_REACTION)
         except Exception as ex:
             print(ex)
             traceback.print_exc()

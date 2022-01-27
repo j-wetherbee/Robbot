@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from discord import Embed
-from util.Utility import Colors
+from discord.colour import Color
 
 #region Embedder
 class Embedder(ABC):
@@ -15,7 +15,7 @@ class DrinkEmbedder(Embedder):
     @staticmethod
     def embed(drink) -> Embed:
 
-        embed = Embed(title= drink._name, description='A drink for you, good Bud.', color=Colors().dark_navy)
+        embed = Embed(title= drink._name, description='A drink for you, good Bud.', color=Color.dark_blue().value)
         embed.set_image(url= drink._img)
         embed.add_field(name="Name", value= drink._name)
         embed.add_field(name="Category", value= drink._category)
@@ -35,7 +35,7 @@ class PinEmbedder(Embedder):
 
     @staticmethod
     def embed(pin) -> Embed:
-        embed = Embed(title=pin.author, description=f'Posted on {pin.posted_date}', color=int(Colors().user_colors.get_user_color(pin.id)))
+        embed = Embed(title=pin.author, description=f'Posted on {pin.posted_date}', color=Color.gold().value)
         pin_embed = embed
         pin_embed.set_thumbnail(url=pin.avatar)
         pin_embed.add_field(name="Channel", value=pin.channel, inline=False)
