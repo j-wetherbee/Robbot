@@ -1,7 +1,7 @@
 import datetime
 from abc import ABC, abstractmethod
 from discord import Message
-from services.Embedder import PinEmbedder
+from services.Embedder import Embedder
 
 '''
 Pin Objects
@@ -9,8 +9,7 @@ Pin Objects
     object is determined 
 '''
 class Pin:
-    def __init__(self, message, embedder: PinEmbedder):
-
+    def __init__(self, message):
         self.author = message.author.display_name
         self.id = message.author.id
         self.avatar = message.author.avatar_url
@@ -26,5 +25,5 @@ class Pin:
         if len(message.embeds) > 0:
             self.embed = message.embeds
         else:
-            embeds = [embedder.embed(self)]
+            embeds = [Embedder.embed_pin(self)]
             self.embed = embeds

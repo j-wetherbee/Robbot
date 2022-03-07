@@ -13,6 +13,7 @@ CFG_FILENAME = 'config.json'
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+#TOKEN = os.getenv('LOCAL_TOKEN')
 
 with open(CFG_FILENAME) as cfg:
     CFG = json.load(cfg)
@@ -50,7 +51,6 @@ def unload_cogs():
 
 @bot.command(name='refresh', description='Reloads all cogs', aliases=['reload'], hidden=True)
 async def refresh(ctx: commands.Context):
-    print(Color.red().value)
     print('Reloading Cogs...\n')
     unload_cogs()
     load_cogs()
