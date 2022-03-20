@@ -1,30 +1,19 @@
 import os
 import json
 import random
-import re
-import requests
 import asyncio
 import datetime
-
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-
-from funcs.Bartender import Drink
-from funcs.Pin import Pin
-from util.Request import Request
-from util.Sanitizer import DrinkJsonSanitizer
-from util.Formatter import DrinkFormatter
-from util.Embedder import DrinkEmbedder, PinEmbedder
 from util import Rolls
 from util.Music import Music
 
 CFG_FILENAME = 'config.json'
-request = Request(requests)
-
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+#TOKEN = os.getenv('LOCAL_TOKEN')
 
 with open(CFG_FILENAME) as cfg:
     CFG = json.load(cfg)
@@ -43,6 +32,35 @@ async def on_message(message):
     await bot.process_commands(message)
     return
 
+'''
+    Cog Functions & Commands
+'''
+def load_cogs():
+    for file in os.listdir('./cogs'):
+        if file.endswith('.py'):       
+            cog_name, file_extension = os.path.splitext(file)             
+            bot.load_extension(f'cogs.{cog_name}')
+            print(f'{cog_name} extension loaded')
+
+def unload_cogs():
+    for file in os.listdir('./cogs'):
+        if file.endswith('.py'): 
+            cog_name, file_extension = os.path.splitext(file)             
+            bot.unload_extension(f'cogs.{cog_name}')
+            print(f'{cog_name} extension unloaded')
+
+@bot.command(name='refresh', description='Reloads all cogs', aliases=['reload'], hidden=True)
+async def refresh(ctx: commands.Context):
+    print('Reloading Cogs...\n')
+    unload_cogs()
+    load_cogs()
+    print('Cogs reloaded successfully')
+    reaction = '👍'
+    await ctx.message.add_reaction(reaction)
+
+'''
+    TODO: Create Cogs for the follow commands
+'''
 @bot.command(name='8ball')
 async def shake_8ball(ctx):
     async with ctx.typing():
@@ -123,12 +141,8 @@ async def _download_msgs(ctx):
         # get data directory
         script_dir = os.path.dirname(__file__)
         guild_name = "".join(x for x in ctx.guild.name if x.isalnum())  # need to sanitize ':', etc
-        data_dir = os.path.join(script_dir, f"data/{guild_name}_{ctx.guild.id}")
+        data_dir = os.path.join(script_dir, f"data/{guild_name}_{ctx.guild.id}/{filename}")
         data_dir = os.path.abspath(data_dir)
-        if not os.path.exists(data_dir):
-            os.makedirs(data_dir)
-
-        filename = os.path.join(data_dir, filename)
         
         with open(filename, 'w+') as f:
             messages = {}
@@ -144,8 +158,6 @@ async def _download_msgs(ctx):
             json.dump(messages, f)
         await ctx.send('Done')
 
-
-
 @bot.command()
 async def test(ctx):
     await ctx.send('.test')
@@ -156,49 +168,5 @@ async def check_react_ohwow(message):
             if emoji.name == 'ohwow':
                 await message.add_reaction(emoji)
 
-
-'''
-@author: Keeth S.
-@desc: Returns a random drink embedded from the Drink object's  embed method
-@retunrs: async message back to channel
-'''
-@bot.command()
-async def drink(ctx):
-    try:
-        drink_json = request.get_drink_json()
-        drink = Drink(drink_json, DrinkJsonSanitizer, DrinkFormatter, DrinkEmbedder)
-        await ctx.send(embed = drink.embed)
-    except Exception as ex:
-        print(ex)
-        await ctx.send('Ayo, your code is wack.')
-
-@bot.command()
-async def cocktail(ctx):
-    await drink(ctx)
-
-'''
-@author: Keeth S.
-@desc: Sends a embed to the Pin channel when a user reply's to a message with .pin
-@retunrs: async message back to channel confirming message was pinned
-'''
-@bot.command()
-async def pin(ctx):
-    try:
-        if not ctx.message.reference:
-            await ctx.message.channel.send('You have to reply .pin to the message you want pinned.')
-            return
-        reply = await ctx.message.channel.fetch_message(ctx.message.reference.message_id)
-        pin = Pin(reply, PinEmbedder)
-        pin_channel = bot.get_channel(789771971532947486)
-        await pin_channel.send(embed=pin.embed)
-        await ctx.message.channel.send('You got it, bud.')
-    except Exception as ex:
-        print(ex)
-        await ctx.message.channel.send('Ayo, your code is wack.')
-
-
-async def get_cocktail(msg):
-
-    pass
-
+load_cogs()
 bot.run(TOKEN)

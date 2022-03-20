@@ -1,7 +1,6 @@
 import re
 import random
 
-
 def rolls_from_args(args: str):
     args_match = lambda arg_pattern: _RollUtil._args_match_regex(arg_pattern, args)
 
@@ -146,4 +145,3 @@ class _ListRoll():  # Names TBD
         choices_str = "Choices: " + ", ".join(self.choices)
         result_str = f"Result: {self.result}"
         return f"{choices_str}\n{result_str}"
-
