@@ -1,4 +1,5 @@
-from services.Embedder import Embedder
+from discord import Embed, Color
+
 
 '''
 Drink Object
@@ -15,7 +16,7 @@ class Drink():
         self.glass = drink_json.get('strGlass')
         self.ingredients_string = self.get_ingredient_string(drink_json)
         self.instructions = drink_json.get('strInstructions')
-        self.embed = Embedder.embed_drink(self)
+        self.embed = self.embed_drink()
 
     
     def sanitize_json(self, json: dict):
@@ -42,4 +43,21 @@ class Drink():
                 pass
             else:
                 ingredient_list.append(ingredients[i])
-        return ingredient_list  
+        return ingredient_list
+
+    def embed_drink(self) -> Embed:
+        embed = Embed(title= self.name, description='A drink for you, good Bud.', color=Color.dark_blue().value)
+        embed.set_image(url= self.img)
+        embed.add_field(name="Name", value= self.name)
+        embed.add_field(name="Category", value= self.category)
+        embed.add_field(name="\u200b", value='\u200b')
+        embed.add_field(name="Alcoholic?", value= self.alcoholic)
+        embed.add_field(name="Glass Type", value= self.glass)
+        embed.add_field(name="\u200b", value='\u200b')
+        ingredient_string = ""
+        for string in  self.ingredients_string:
+            ingredient_string += string + '\n'
+        embed.add_field(name="Ingredients", value=ingredient_string, inline=False)
+        embed.add_field(name="Instructions", value= self.instructions, inline=False)
+        embed.set_footer(text="Have ideas for additional functionality? Throw them in #robbot_discussion!")
+        return embed

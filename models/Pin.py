@@ -1,7 +1,5 @@
 import datetime
-from abc import ABC, abstractmethod
-from discord import Message
-from services.Embedder import Embedder
+from discord import Embed, Color
 
 '''
 Pin Objects
@@ -25,5 +23,18 @@ class Pin:
         if len(message.embeds) > 0:
             self.embed = message.embeds
         else:
-            embeds = [Embedder.embed_pin(self)]
+            embeds = [self.embed_pin()]
             self.embed = embeds
+
+    def embed_pin(self) -> Embed:
+        embed = Embed(title=self.author, description=f'Posted on {self.posted_date}', color=Color.gold().value)
+        pin_embed = embed
+        pin_embed.set_thumbnail(url=self.avatar)
+        pin_embed.add_field(name="Channel", value=self.channel, inline=False)
+        if(self.image is not None):
+            pin_embed.set_image(url=self.image)
+        if(self.content is not None):
+            pin_embed.add_field(name="Message", value=f'[{self.content}]({self.url})', inline=False)
+        else:
+            pin_embed.add_field(name="Message", value='*This pin had no message*', inline=False)
+        return pin_embed

@@ -2,7 +2,6 @@ import traceback
 import requests as req
 from discord.ext import commands
 from models.Drink import Drink
-from services import Embedder
 
 class Bartender(commands.Cog, name='Bartender', description='Used to provide any bud with a delicious, sensual drink'):
     FACTORY_TYPE = 'drink'
